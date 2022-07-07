@@ -89,7 +89,9 @@ export default function VideoTranscode() {
       <div
         className={clsx(
           'px-3 md:m-auto container transition-all duration-300 ease-in-out ',
-          isShowTask ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : 'w-1/2 m-auto'
+          isShowTask
+            ? 'grid grid-cols-1 md:grid-cols-2 gap-4'
+            : 'md:w-1/2 m-auto'
         )}
       >
         <div>
