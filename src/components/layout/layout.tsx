@@ -1,16 +1,18 @@
-import Head from 'next/head'
+import Head from 'next/head';
 type Props = {
-  children: React.ReactNode
-}
+  children: React.ReactNode;
+};
 const Layout: React.FC<Props> = ({ children }) => {
   return (
-    <div className="layout">
+    <div className='layout'>
       {/* <Header /> */}
-      <Head><title>tool</title></Head>
-      <main className="layout__content sm:container mx-auto">{children}</main>
+      <Head>
+        <title>视频格式转换助手</title>
+      </Head>
+      <main className='layout__content sm:container mx-auto'>{children}</main>
       {/* <Footer /> */}
     </div>
   );
-}
+};
 
-export default Layout
+export default Layout;
