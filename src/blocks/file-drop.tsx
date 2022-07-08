@@ -6,8 +6,8 @@ import FilePlus from '@geist-ui/icons/filePlus';
 // import colors from "tailwindcss/colors";
 import clsx from 'clsx';
 export type FileDropType = {
-  onDrop: (item: { files: FileList }) => void;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onDrop?: (item: { files: FileList }) => void;
+  onChange: (files: FileList | null) => void;
   filesCount: number;
 };
 
@@ -31,9 +31,10 @@ const FileDrop = (props: FileDropType, ref: Ref<InputRef>) => {
     () => ({
       accept: [NativeTypes.FILE],
       drop(item: { files: FileList }) {
-        if (props.onDrop) {
-          props.onDrop(item);
-        }
+        props.onChange(item.files);
+        // if (props.onDrop) {
+        // props.onDrop(item);
+        // }
       },
       canDrop(item: any) {
         return true;
@@ -63,7 +64,7 @@ const FileDrop = (props: FileDropType, ref: Ref<InputRef>) => {
   };
 
   const onChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    props.onChange(e);
+    props.onChange(e.target.files);
   };
   const isActive = canDrop && isOver;
   return (
@@ -92,6 +93,7 @@ const FileDrop = (props: FileDropType, ref: Ref<InputRef>) => {
       <input
         ref={inputFile}
         onChange={onChange}
+        accept='video/*'
         type='file'
         multiple
         className='opacity-0 absolute -top-96'

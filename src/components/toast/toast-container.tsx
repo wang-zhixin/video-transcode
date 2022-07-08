@@ -18,7 +18,7 @@ const ToastContainer = () => {
   return ReactDOM.createPortal(
     <ul
       className={clsx(
-        `fixed z-50 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2  flex flex-col items-end space-y-2`
+        `fixed z-50 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2  flex flex-col items-center space-y-2`
       )}
     >
       <AnimatePresence>

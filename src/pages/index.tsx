@@ -12,6 +12,7 @@ import useSettings from '$/hooks/use-settings';
 import { useToast } from '$/components/toast/use-toast';
 
 import options, { OptionKey } from '$/blocks/video/options';
+import isVideo from '$/utils/is-video';
 
 import PlayFill from '@geist-ui/icons/playFill';
 import Layout from '$/components/layout/index';
@@ -31,8 +32,8 @@ const useFiles = () => {
   const clearFiles = useCallback(() => {
     setFiles([]);
   }, []);
-  const addFiles = useCallback((files: FileList) => {
-    setFiles((prev) => [...prev, ...Array.from(files)]);
+  const addFiles = useCallback((files: File[]) => {
+    setFiles((prev) => [...prev, ...files]);
   }, []);
   return { files, addFiles, removeFile, clearFiles };
 };
@@ -45,19 +46,22 @@ export default function VideoTranscode() {
   const { files, addFiles, removeFile, clearFiles } = useFiles();
 
   const onFileChange: FileDropType['onChange'] = useCallback(
-    (e) => {
-      if (e.target.files) {
-        const files = e.target.files;
-        addFiles(files);
+    (files) => {
+      if (files) {
+        const videoFiles: File[] = [];
+        Array.from(files).forEach((file) => {
+          if (isVideo(file)) {
+            videoFiles.push(file);
+          } else {
+            showToast({
+              title: `${file.name} 不是视频文件`,
+            });
+          }
+        });
+        addFiles(videoFiles);
       }
     },
-    [addFiles]
-  );
-  const onDrop: FileDropType['onDrop'] = useCallback(
-    (item) => {
-      addFiles(item.files);
-    },
-    [addFiles]
+    [addFiles, showToast]
   );
   const handleStartClick = () => {
     if (files.length === 0) {
@@ -97,7 +101,6 @@ export default function VideoTranscode() {
         <div>
           <div className='p-8 rounded sticky top-0'>
             <FileDrop
-              onDrop={onDrop}
               onChange={onFileChange}
               filesCount={files.length}
               ref={inputRef}
@@ -209,10 +212,6 @@ export default function VideoTranscode() {
                   </div> */}
                   {/* {task.downloadUrl && <video controls src={task.downloadUrl} className="aspect-video w-full"></video>} */}
 
-                  {/* <Text
-                  title={task.file.name}
-                  onTextClick={() => onTextClick(task.id)}
-                /> */}
                   {task.status === TaskStatus.UPLOADING && (
                     <Progress percent={task.progress} />
                   )}
@@ -230,6 +229,11 @@ export default function VideoTranscode() {
                     {task.status === TaskStatus.CONVERTING && (
                       <div className='text-center text-sm text-gray-600 font-bold'>
                         转换中...
+                      </div>
+                    )}
+                    {task.status === TaskStatus.ERROR && (
+                      <div className='text-center text-sm text-gray-600 font-bold'>
+                        转换失败
                       </div>
                     )}
                     {task.status === TaskStatus.SUCCESS && (

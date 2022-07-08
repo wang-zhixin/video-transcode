@@ -118,6 +118,15 @@ const useStore = create<State>()(
                 });
               });
             }
+            if (data.status === 'Failed') {
+              set((state) => {
+                state.tasks.forEach((t) => {
+                  if (t.id === task.id) {
+                    t.status = TaskStatus.ERROR;
+                  }
+                });
+              });
+            }
           })
           .catch((err) => {
             set((state) => {
