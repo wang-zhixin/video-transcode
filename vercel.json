@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "pages/api/sts.ts": {
+      "memory": 512
+    },
+    "pages/api/flow.ts": {
+      "memory": 512
+    }
+  }
+}
