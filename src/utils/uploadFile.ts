@@ -6,7 +6,7 @@ type prefix = string;
 const uploadFile = async (
   name: prefix,
   file: File,
-  options?: OSS.PutObjectOptions | undefined
+  options?: OSS.PutObjectOptions | OSS.MultipartUploadOptions | undefined
 ) => {
   if (!ossClient) {
     const res = await fetch('/api/sts');
@@ -31,6 +31,11 @@ const uploadFile = async (
   if (file.size < 1024 * 1024 * 10) {
     return ossClient.put(name, file, options);
   } else {
+    const multipartUploadOptions: OSS.MultipartUploadOptions = {
+      partSize: 10 * 1024 * 1024,
+      ...options,
+    };
+    return ossClient.multipartUpload(name, file, multipartUploadOptions);
   }
 };
 

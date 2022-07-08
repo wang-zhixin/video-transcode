@@ -33,7 +33,6 @@ type State = {
   tasks: TaskItem[];
   addTasks: (files: File[], settings: Settings) => void;
   uploadFile: (task: TaskItem) => void;
-  uploadFiles: (tasks: TaskItem[]) => void;
   startTasks: (tasks: TaskItem[]) => void;
   transcode: (task: TaskItem) => void;
   checkTaskStatus: (task: any, data: any) => void;
@@ -165,36 +164,24 @@ const useStore = create<State>()(
         });
       },
       uploadFile: async (task) => {
-        const res = await uploadFile(task.videoKey, task.file);
-        res?.url &&
-          set((state) => {
-            const index = state.tasks.findIndex((t) => t.id === task.id);
-            if (index > -1) {
-              state.tasks[index].downloadUrl = res.url;
-              state.tasks[index].status = TaskStatus.CONVERTING;
-              state.tasks[index].progress = 100;
-            }
-          });
-      },
-      uploadFiles: async (tasks) => {
-        tasks.forEach(async (task) => {
-          try {
-            const fileExtension = task.file.name.split('.').pop();
-            const res = await uploadFile(
-              `/web/nocheck_${task.id}.${fileExtension}`,
-              task.file
-            );
-            res?.url &&
-              set((state) => {
-                const index = state.tasks.findIndex((t) => t.id === task.id);
-                if (index > -1) {
-                  state.tasks[index].downloadUrl = res.url;
-                  state.tasks[index].status = TaskStatus.CONVERTING;
-                  state.tasks[index].progress = 100;
+        await uploadFile(task.videoKey, task.file, {
+          progress: (percent) => {
+            console.log(percent, '%');
+
+            set((state) => {
+              state.tasks.forEach((t) => {
+                if (t.id === task.id) {
+                  t.progress = percent;
                 }
               });
-          } catch (error) {
-            console.log(error);
+            });
+          },
+        });
+        set((state) => {
+          const index = state.tasks.findIndex((t) => t.id === task.id);
+          if (index > -1) {
+            state.tasks[index].status = TaskStatus.CONVERTING;
+            state.tasks[index].progress = 100;
           }
         });
       },
