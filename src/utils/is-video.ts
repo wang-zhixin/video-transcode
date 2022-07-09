@@ -38,7 +38,7 @@ const extensions = [
 export default function isVideo(file: File): boolean {
   const fileExtension = file.name.split('.').pop();
   if (fileExtension) {
-    return extensions.includes(fileExtension);
+    return extensions.includes(fileExtension.toLowerCase());
   }
   return false;
 }
