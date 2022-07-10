@@ -9,6 +9,9 @@ import { uploadFile } from '$/utils';
 import type { Settings } from '$/blocks/video/options';
 import type { Task } from '$/types/task';
 import { TaskStatus } from '$/types/task';
+import buildFFmpegCommand from '$/utils/buildFFmpegCommand';
+
+
 type StartFlowResponse = {
   Name: string;
   FlowName: string;
@@ -160,10 +163,11 @@ const useStore = create<State>()(
           await ffmpeg.load();
         }
         ffmpeg.FS('writeFile', task.file.name, await fetchFile(task.file));
-        const outputPath = `${task.file.name.split('.')[0]}.${
+        const outputPath = `output_${task.file.name.split('.')[0]}.${
           task.settings.format
         }`;
-        await ffmpeg.run('-i', task.file.name, outputPath);
+        const commandList = buildFFmpegCommand(task.settings);
+        await ffmpeg.run.apply(ffmpeg, ['-i', task.file.name, ...commandList, outputPath]);
         const data = ffmpeg.FS('readFile', outputPath);
         const url = URL.createObjectURL(
           new Blob([data.buffer], {

@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { useState } from 'react';
 import { motion, m, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
@@ -9,9 +9,11 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import useStore from '$/store/video';
 import useSettings from '$/hooks/use-settings';
 import { useToast } from '$/components/toast/use-toast';
+import useNotification from '$/hooks/useNotification';
 
 import options, { OptionKey } from '$/blocks/video/options';
 import isVideo from '$/utils/is-video';
+import { TaskStatus } from '$/types/task';
 
 import PlayFill from '@geist-ui/icons/playFill';
 import Layout from '$/components/layout/index';
@@ -19,6 +21,7 @@ import FileDrop, { FileDropType, InputRef } from '$/blocks/file-drop';
 import { Button } from '$/components/button';
 import { Select } from '$/components/select';
 import TaskCard from '$/blocks/video/task-card';
+import WebNotification from '$/components/web-notification';
 
 const useFiles = () => {
   const [files, setFiles] = useState<File[]>([]);
@@ -41,9 +44,9 @@ export default function VideoTranscode() {
   const { showToast } = useToast();
   const tasks = useStore((state) => state.tasks);
   const addTasks = useStore((state) => state.addTasks);
-  const downloadOutput = useStore((state) => state.downloadOutput);
   const { files, addFiles, removeFile, clearFiles } = useFiles();
 
+  const {show, requestPermission} = useNotification();
   const onFileChange: FileDropType['onChange'] = useCallback(
     (files) => {
       if (files) {
@@ -69,6 +72,7 @@ export default function VideoTranscode() {
       });
       return;
     }
+    requestPermission()
     addTasks(files, settings);
     clearFiles();
     inputRef.current.clear();
@@ -177,7 +181,14 @@ export default function VideoTranscode() {
                   }}
                   
                 >
-                  <TaskCard task={task} />
+                  <>
+                    <TaskCard task={task} />
+                    {
+                      task.status === TaskStatus.SUCCESS && (
+                        <WebNotification title='视频转换成功通知' body={`${task.file.name}\r\n目标格式：${task.settings.format}`} icon="/favicon.ico" />
+                      )
+                    }
+                  </>
                 </motion.li>
               ))}
             </AnimatePresence>
