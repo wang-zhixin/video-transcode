@@ -410,6 +410,16 @@ const videoRotateOptions = [
   },
 ] as const;
 
+const transcodeTypeOptions = [
+  {
+    label: '云端转换(推荐)',
+    value: 'cloud',
+  },
+  {
+    label: '本地转换',
+    value: 'local',
+  }
+] as const;
 const options = {
   format: {
     label: '目标格式',
@@ -439,6 +449,10 @@ const options = {
     label: '视频旋转',
     options: videoRotateOptions,
   },
+  transcodeType: {
+    label: '转换方式',
+    options: transcodeTypeOptions,
+  }
 } as const;
 
 // type GetOptionValue<T> = T extends keyof typeof options ? OptionsValue<typeof options[T]['options']> : never;
