@@ -1,0 +1,21 @@
+{
+  "name": "视频格式转换助手",
+  "short_name": "视频转换",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#07c160",
+  "background_color": "#FFFFFF",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "/icons/logo-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/logo-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
