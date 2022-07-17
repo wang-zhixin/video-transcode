@@ -102,7 +102,7 @@ export default function VideoTranscode() {
         )}
       >
         <div>
-          <div className='p-8 rounded sticky top-0'>
+          <div className='py-4 md:p-8 rounded sticky top-0'>
             <FileDrop
               onChange={onFileChange}
               filesCount={files.length}
