@@ -16,7 +16,7 @@ const useSettings = () => {
     aspect: '',
     audioBitrate: '',
     videoRotate: '',
-    transcodeType: 'cloud',
+    transcodeType: 'local',
   });
   const setSetting = (
     name: keyof Settings,
