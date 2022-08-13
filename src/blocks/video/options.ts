@@ -165,6 +165,10 @@ export const formatOptions = [
     label: 'ogv',
     value: 'ogv',
   },
+{
+label:'m4a',
+value:'m4a',
+},
   {
     label: 'gif',
     value: 'gif',
