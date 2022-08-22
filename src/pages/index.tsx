@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useState } from 'react';
-import { motion, m, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 
 import { DndProvider } from 'react-dnd';
@@ -15,7 +15,6 @@ import options, { OptionKey } from '$/blocks/video/options';
 import isVideo from '$/utils/is-video';
 import { TaskStatus } from '$/types/task';
 
-import PlayFill from '@geist-ui/icons/playFill';
 import Layout from '$/components/layout/index';
 import FileDrop, { FileDropType, InputRef } from '$/blocks/file-drop';
 import { Button } from '$/components/button';

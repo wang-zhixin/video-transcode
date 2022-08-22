@@ -54,7 +54,7 @@ export function Select<T extends string | number = string>(
                 >
                   <Listbox.Options
                     className={clsx(
-                      'focus-visible:outline-none max-h-60 overflow-auto overscroll-contain50'
+                      'focus-visible:outline-none max-h-60 overflow-auto overscroll-contain50 px-2'
                     )}
                     static
                   >
@@ -88,9 +88,9 @@ function SelectOption<T>(props: SelectOptionProps<T>): JSX.Element {
       {({ selected, active }) => (
         <li
           className={clsx(
-            active ? 'bg-primary-light' : '',
-            selected && 'text-primary-dark',
-            'relative cursor-default select-none py-2 pl-8 pr-4'
+            active ? 'text-white bg-primary' : '',
+            selected && 'text-white bg-primary',
+            'my-1 relative cursor-default select-none py-2 pl-8 pr-4 rounded hover:text-white'
           )}
         >
           {selected && (
