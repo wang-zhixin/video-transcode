@@ -4,6 +4,9 @@ import { useDrop } from 'react-dnd';
 import { NativeTypes } from 'react-dnd-html5-backend';
 import FilePlus from '@geist-ui/icons/filePlus';
 // import colors from "tailwindcss/colors";
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+
 import clsx from 'clsx';
 export type FileDropType = {
   onDrop?: (item: { files: FileList }) => void;
@@ -27,6 +30,7 @@ const Text: React.FC<TextProps> = (props) => {
   );
 };
 const FileDrop = (props: FileDropType, ref: Ref<InputRef>) => {
+  const { t } = useTranslation('common')
   const [{ canDrop, isOver }, drop] = useDrop(
     () => ({
       accept: [NativeTypes.FILE],
@@ -85,7 +89,7 @@ const FileDrop = (props: FileDropType, ref: Ref<InputRef>) => {
       />
       <div className={clsx('ml-2')}>
         <div>
-          {isActive ? '松开鼠标放置文件' : '拖动文件到此处或者点击添加'}
+          {isActive ? t('upload-file-active-tips'): t('upload-file-tips')}
         </div>
         {props.filesCount > 0 && <div>{props.filesCount}个文件已添加</div>}
       </div>
@@ -105,3 +109,12 @@ const FileDrop = (props: FileDropType, ref: Ref<InputRef>) => {
 export default forwardRef(FileDrop);
 
 export { Text };
+
+// export async function getServerSideProps({ locale }: { locale: string }) {
+//   return {
+//     props: {
+//       ...(await serverSideTranslations(locale, ['common'])),
+//       // Will be passed to the page component as props
+//     },
+//   };
+// }

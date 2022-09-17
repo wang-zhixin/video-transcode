@@ -21,6 +21,9 @@ import Progress from '$/components/progress';
 import { Button } from '$/components/button';
 import { Select } from '$/components/select';
 
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+
 const useFiles = () => {
   const [files, setFiles] = useState<File[]>([]);
   const removeFile = useCallback(
@@ -38,6 +41,7 @@ const useFiles = () => {
   return { files, addFiles, removeFile, clearFiles };
 };
 export default function VideoTranscode() {
+  const { t } = useTranslation('common')
   const inputRef = useRef<InputRef>(null!);
   const { showToast } = useToast();
   const tasks = useStore((state) => state.tasks);
@@ -54,7 +58,7 @@ export default function VideoTranscode() {
             videoFiles.push(file);
           } else {
             showToast({
-              title: `${file.name} 不是视频文件`,
+              title: `${file.name} ${t('not-a-video-file')}`,
             });
           }
         });
@@ -66,7 +70,7 @@ export default function VideoTranscode() {
   const handleStartClick = () => {
     if (files.length === 0) {
       showToast({
-        title: '请先选择文件',
+        title: t('not-select-file-tips'),
       });
       return;
     }
@@ -114,14 +118,15 @@ export default function VideoTranscode() {
                         value={settings[key as keyof typeof settings]}
                         name={key}
                         label={`${
-                          options[key as keyof typeof settings].label
+                          options[key as keyof typeof settings].label(t(options[key as keyof typeof settings].i18nName))
                         }：`}
                         onChange={(val) =>
                           setSetting(key as keyof typeof settings, val)
                         }
                         className='w-full'
                       >
-                        {value.options.map(({ label, value }) => (
+                        {/* 渲染选择器配置时，如果是第一个，则使用i18n的方式渲染label */}
+                        {value.options.map((item, index) => (index === 0 ? {...item, label: t('default')}: item)).map(({ label, value }) => (
                           <Select.Option key={value} value={value}>
                             {label}
                           </Select.Option>
@@ -262,3 +267,13 @@ export default function VideoTranscode() {
 VideoTranscode.getLayout = function getLayout(page: React.ReactElement) {
   return <Layout>{page}</Layout>;
 };
+
+
+export async function getServerSideProps({ locale }: { locale: string }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['common'])),
+      // Will be passed to the page component as props
+    },
+  };
+}

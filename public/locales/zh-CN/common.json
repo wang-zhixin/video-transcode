@@ -1,0 +1,8 @@
+{
+  "upload-file-tips": "拖动文件到此处或者点击添加",
+  "upload-file-active-tips": "松开鼠标放置文件",
+  "not-select-file-tips": "请先选择文件!",
+  "not-a-video-file": "不是视频文件",
+  "default": "保持原样",
+  "format": "目标格式"
+}

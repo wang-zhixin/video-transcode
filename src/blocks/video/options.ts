@@ -412,33 +412,34 @@ const videoRotateOptions = [
 
 const options = {
   format: {
-    label: '目标格式',
+    i18nName: 'format',
+    label: (text: string) => text,
     options: formatOptions,
   },
-  size: {
-    label: '视频尺寸',
-    options: sizeOptions,
-  },
-  videoBitrate: {
-    label: '视频比特率',
-    options: bitrateOptions,
-  },
-  framerate: {
-    label: '视频帧率',
-    options: framerateOptions,
-  },
-  aspect: {
-    label: '视频比例',
-    options: aspectOptions,
-  },
-  audioBitrate: {
-    label: '音频比特率',
-    options: audioBitrateOptions,
-  },
-  videoRotate: {
-    label: '视频旋转',
-    options: videoRotateOptions,
-  },
+  // size: {
+  //   label: '视频尺寸',
+  //   options: sizeOptions,
+  // },
+  // videoBitrate: {
+  //   label: '视频比特率',
+  //   options: bitrateOptions,
+  // },
+  // framerate: {
+  //   label: '视频帧率',
+  //   options: framerateOptions,
+  // },
+  // aspect: {
+  //   label: '视频比例',
+  //   options: aspectOptions,
+  // },
+  // audioBitrate: {
+  //   label: '音频比特率',
+  //   options: audioBitrateOptions,
+  // },
+  // videoRotate: {
+  //   label: '视频旋转',
+  //   options: videoRotateOptions,
+  // },
 } as const;
 
 // type GetOptionValue<T> = T extends keyof typeof options ? OptionsValue<typeof options[T]['options']> : never;
