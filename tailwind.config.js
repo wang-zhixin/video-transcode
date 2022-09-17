@@ -15,6 +15,7 @@ module.exports = {
           light: 'var(--primary-light)',
           dark: 'var(--primary-dark)',
           DEFAULT: 'var(--primary)',
+          100: 'var(--primary-100)',
         }
       }
     },

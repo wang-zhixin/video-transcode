@@ -1,12 +1,13 @@
 /** @type {import('next').NextConfig} */
+const withPWA = require('next-pwa')
 const { i18n } = require("./next-i18next.config")
-const nextConfig = {
+const nextConfig = withPWA({
   i18n,
   reactStrictMode: true,
   async headers() {
     return [
       {
-        source: "/video", // change to appropriate path
+        source: "/", // change to appropriate path
         headers: [
           {
             key: "Cross-Origin-Embedder-Policy",
@@ -20,6 +21,10 @@ const nextConfig = {
       },
     ];
   },
-};
+  pwa: {
+    dest: 'public',
+    disable: process.env.NODE_ENV === 'development',
+  }
+})
 
 module.exports = nextConfig;

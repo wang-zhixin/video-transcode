@@ -1,41 +1,32 @@
 import { nanoid } from 'nanoid';
+import mine from 'mime-types';
+import FileSaver from 'file-saver';
 import { createFFmpeg, fetchFile, FFmpeg } from '@ffmpeg/ffmpeg';
 import create from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { devtools } from 'zustand/middleware';
 import { uploadFile } from '$/utils';
 import type { Settings } from '$/blocks/video/options';
-type OutputItem = {
-  key: string;
-  size: number;
+import type { Task } from '$/types/task';
+import { TaskStatus } from '$/types/task';
+import buildFFmpegCommand from '$/utils/buildFFmpegCommand';
+
+
+type StartFlowResponse = {
+  Name: string;
+  FlowName: string;
 };
-export type TaskItem = {
-  id: string;
-  file: File;
-  videoKey: string;
-  progress: number;
-  videoUrl: string;
-  downloadUrl?: string;
-  status: TaskStatus;
-  settings: Settings;
-  outputs?: OutputItem[];
-  animateDelay: number;
-};
-export enum TaskStatus {
-  PENDIND = 'PENDING',
-  CONVERTING = 'CONVERTING',
-  UPLOADING = 'UPLOADING',
-  SUCCESS = 'SUCCESS',
-  ERROR = 'ERROR',
-}
 
 type State = {
-  tasks: TaskItem[];
+  tasks: Task[];
   addTasks: (files: File[], settings: Settings) => void;
-  uploadFile: (task: TaskItem) => void;
-  startTasks: (tasks: TaskItem[]) => void;
-  transcode: (task: TaskItem) => void;
+  uploadFile: (task: Task) => void;
+  startTasks: (tasks: Task[]) => void;
+  startFlow: (task: Task) => Promise<StartFlowResponse>;
+  transcode: (task: Task) => void;
+  startNextTranscode: () => void;
   checkTaskStatus: (task: any, data: any) => void;
+  downloadOutput: (task: Task) => void;
 };
 
 let ffmpeg: FFmpeg | null = null;
@@ -64,47 +55,28 @@ const useStore = create<State>()(
         get().startTasks(tasks);
       },
       startTasks: async (tasks) => {
-        // get().uploadFiles(tasks);
-        const { uploadFile, checkTaskStatus } = get();
+        const { uploadFile, checkTaskStatus, startFlow, transcode } = get();
         for (const task of tasks) {
-          await uploadFile(task);
-          const response = await fetch('/api/flow', {
-            method: 'POST',
-            body: JSON.stringify({
-              bucketName: process.env.ALI_BUCKET_NAME,
-              videoKey: task.videoKey,
-              // duration: task.settings.duration,
-              size: task.file.size,
-              fileName: task.file.name,
-              targetType: [task.settings.format],
-              options: {
-                videoSize: task.settings?.size,
-                videoBitrate: task.settings?.videoBitrate,
-                videoFramerate: task.settings?.framerate,
-                videoAspect: task.settings?.aspect,
-                audioBitrate: task.settings?.audioBitrate,
-                videoRotate: task.settings?.videoRotate,
-                targetFormats: [task.settings?.format],
-              },
-            }),
-          });
-          const data = await response.json();
-          checkTaskStatus(task, data);
-
-          // await transcode(task);
+          if (task.settings.transcodeType === 'local') {
+            transcode(task);
+          } else {
+            await uploadFile(task);
+            const startFlowResponse = await startFlow(task);
+            checkTaskStatus(task, startFlowResponse);
+          }
         }
       },
       // 轮询接口检查任务状态
-      checkTaskStatus(task, startTasksResponse: any) {
+      checkTaskStatus(task, startFlowResponse: StartFlowResponse) {
         fetch(
-          `/api/flow?name=${startTasksResponse.Name}&flowName=${startTasksResponse.FlowName}`
+          `/api/flow?name=${startFlowResponse.Name}&flowName=${startFlowResponse.FlowName}`
         )
           .then((res) => {
             return res.json();
           })
           .then((data) => {
             if (data.status === 'Running') {
-              get().checkTaskStatus(task, startTasksResponse);
+              get().checkTaskStatus(task, startFlowResponse);
             }
             if (data.status === 'Succeeded') {
               set((state) => {
@@ -138,11 +110,52 @@ const useStore = create<State>()(
             // TODO: 失败重试
           });
       },
-
-      async transcode(task: TaskItem) {
+      async startFlow(task: Task) {
+        const response = await fetch('/api/flow', {
+          method: 'POST',
+          body: JSON.stringify({
+            bucketName: process.env.ALI_BUCKET_NAME,
+            videoKey: task.videoKey,
+            // duration: task.settings.duration,
+            size: task.file.size,
+            fileName: task.file.name,
+            targetType: [task.settings.format],
+            options: {
+              videoSize: task.settings?.size,
+              videoBitrate: task.settings?.videoBitrate,
+              videoFramerate: task.settings?.framerate,
+              videoAspect: task.settings?.aspect,
+              audioBitrate: task.settings?.audioBitrate,
+              videoRotate: task.settings?.videoRotate,
+              targetFormats: [task.settings?.format],
+            },
+          }),
+        });
+        const data = await response.json();
+        return data;
+      },
+      async transcode(task: Task) {
+        const tasks = get().tasks;
+        // 本地转换一次只能运行一个任务
+        if (
+          tasks.some(
+            (t) =>
+              [TaskStatus.CONVERTING].includes(t.status) &&
+              t.settings.transcodeType === 'local'
+          )
+        ) {
+          return;
+        }
+        set((state) => {
+          state.tasks.forEach((t) => {
+            if (t.id === task.id) {
+              t.status = TaskStatus.CONVERTING;
+            }
+          });
+        });
         if (ffmpeg === null) {
           ffmpeg = createFFmpeg({
-            log: true,
+            log: process.env.NODE_ENV === 'development',
             corePath: '/ffmpeg-core/ffmpeg-core.js',
           });
         }
@@ -150,24 +163,47 @@ const useStore = create<State>()(
           await ffmpeg.load();
         }
         ffmpeg.FS('writeFile', task.file.name, await fetchFile(task.file));
-        await ffmpeg.run('-i', task.file.name, 'output.mp4');
-        const data = ffmpeg.FS('readFile', 'output.mp4');
+        const outputPath = `output_${task.file.name.split('.')[0]}.${
+          task.settings.format
+        }`;
+        const commandList = buildFFmpegCommand(task.settings);
+        await ffmpeg.run.apply(ffmpeg, ['-i', task.file.name, ...commandList, outputPath]);
+        const data = ffmpeg.FS('readFile', outputPath);
         const url = URL.createObjectURL(
-          new Blob([data.buffer], { type: 'video/mp4' })
+          new Blob([data.buffer], {
+            type: mine.lookup(outputPath) || 'video/mp4',
+          })
         );
         set((state) => {
           const index = state.tasks.findIndex((item) => item.id === task.id);
           if (index > -1) {
+            state.tasks[index].outputs = [
+              {
+                key: outputPath,
+                size: data.buffer.byteLength,
+              },
+            ];
             state.tasks[index].downloadUrl = url;
             state.tasks[index].status = TaskStatus.SUCCESS;
           }
         });
+        ffmpeg.FS('unlink', outputPath);
+        get().startNextTranscode();
+      },
+      startNextTranscode() {
+        const tasks = get().tasks;
+        const task = tasks.find(
+          (t) =>
+            t.status === TaskStatus.PENDIND &&
+            t.settings.transcodeType === 'local'
+        );
+        if (task) {
+          get().transcode(task);
+        }
       },
       uploadFile: async (task) => {
         await uploadFile(task.videoKey, task.file, {
           progress: (percent) => {
-            console.log(percent, '%');
-
             set((state) => {
               state.tasks.forEach((t) => {
                 if (t.id === task.id) {
@@ -184,6 +220,12 @@ const useStore = create<State>()(
             state.tasks[index].progress = 100;
           }
         });
+      },
+      downloadOutput: async (task) => {
+        FileSaver.saveAs(
+          task.downloadUrl!,
+          task.outputs && task.outputs[0] ? task.outputs[0].key : task.file.name
+        );
       },
     }))
   )

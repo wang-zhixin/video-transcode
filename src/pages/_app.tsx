@@ -5,8 +5,8 @@ import { ToastProvider } from '$/components/toast'
 import { appWithTranslation } from 'next-i18next';
 import '$/styles/globals.css'
 type NextPageWithLayout = NextPage & {
-  getLayout?: (page: ReactElement) => ReactNode
-}
+  getLayout?: (page: ReactElement) => ReactNode;
+};
 
 type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout

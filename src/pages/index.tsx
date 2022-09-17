@@ -1,25 +1,26 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { useState } from 'react';
-import { motion, m, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
-import prettyBytes from 'pretty-bytes';
 
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
-import useStore, { TaskStatus } from '$/store/video';
+import useStore from '$/store/video';
 import useSettings from '$/hooks/use-settings';
 import { useToast } from '$/components/toast/use-toast';
+import useNotification from '$/hooks/useNotification';
 
 import options, { OptionKey } from '$/blocks/video/options';
 import isVideo from '$/utils/is-video';
+import { TaskStatus } from '$/types/task';
 
-import PlayFill from '@geist-ui/icons/playFill';
 import Layout from '$/components/layout/index';
 import FileDrop, { FileDropType, InputRef } from '$/blocks/file-drop';
-import Progress from '$/components/progress';
 import { Button } from '$/components/button';
 import { Select } from '$/components/select';
+import TaskCard from '$/blocks/video/task-card';
+import WebNotification from '$/components/web-notification';
 
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -46,9 +47,9 @@ export default function VideoTranscode() {
   const { showToast } = useToast();
   const tasks = useStore((state) => state.tasks);
   const addTasks = useStore((state) => state.addTasks);
-
   const { files, addFiles, removeFile, clearFiles } = useFiles();
 
+  const {show, requestPermission} = useNotification();
   const onFileChange: FileDropType['onChange'] = useCallback(
     (files) => {
       if (files) {
@@ -74,6 +75,7 @@ export default function VideoTranscode() {
       });
       return;
     }
+    requestPermission()
     addTasks(files, settings);
     clearFiles();
     inputRef.current.clear();
@@ -86,7 +88,7 @@ export default function VideoTranscode() {
   const isShowSelf = (key: OptionKey) => {
     if (key === 'format') return true;
     if (settings.format === 'mp3') {
-      if (key === 'audioBitrate') return true;
+      if (key === 'audioBitrate' || key === 'transcodeType') return true;
       return false;
     }
     return true;
@@ -103,7 +105,7 @@ export default function VideoTranscode() {
         )}
       >
         <div>
-          <div className='p-8 rounded sticky top-0'>
+          <div className='py-4 md:p-8 rounded sticky top-0'>
             <FileDrop
               onChange={onFileChange}
               filesCount={files.length}
@@ -181,80 +183,16 @@ export default function VideoTranscode() {
                     scale: 0.5,
                     transition: { duration: 0.2 },
                   }}
-                  className='p-2 border-2 border-white border-solid bg-gradient-to-t from-white to-[#f3f8f5] shadow-card hover:shadow-hover transition-all duration-300 rounded'
+                  
                 >
-                  <div className='truncate'>
-                    <span
-                      className='text-sm text-gray-500 cursor-default'
-                      title={task.file.name}
-                    >
-                      {task.file.name}
-                    </span>
-                  </div>
-                  <div className='text-sm text-gray-600 mt-2'>
-                    <span className='mr-1'>
-                      原格式: {task.file.type.split('/')[1]}
-                    </span>
-                    {/* 遍历settings对象 */}
-                    {Object.entries(task.settings).map(
-                      ([key, value]) =>
-                        value && (
-                          <span key={key} className='mr-1'>
-                            {options[key as keyof typeof options].label}:{' '}
-                            {value}
-                          </span>
-                        )
-                    )}
-                    <span>原大小：{prettyBytes(task.file.size)}</span>
-                    {task.outputs && (
-                      <span>转换后：{prettyBytes(task.outputs[0].size)}</span>
-                    )}
-                  </div>
-                  {/* <div className='flex'>
-                    <button className='p-3 flex justify-center items-center cursor-pointer'>
-                      <PlayFill color='var(--primary)' />
-                    </button>
-                  </div> */}
-                  {/* {task.downloadUrl && <video controls src={task.downloadUrl} className="aspect-video w-full"></video>} */}
-
-                  {task.status === TaskStatus.UPLOADING && (
-                    <Progress percent={task.progress} />
-                  )}
-                  <div className='flex justify-between items-center h-10 border-t border-solid border-gray-100 mt-2 pt-3'>
-                    {task.status === TaskStatus.PENDIND && (
-                      <div className='text-center text-sm text-gray-600 font-bold'>
-                        准备中...
-                      </div>
-                    )}
-                    {task.status === TaskStatus.UPLOADING && (
-                      <div className='text-center text-sm text-gray-600 font-bold'>
-                        上传中...
-                      </div>
-                    )}
-                    {task.status === TaskStatus.CONVERTING && (
-                      <div className='text-center text-sm text-gray-600 font-bold'>
-                        转换中...
-                      </div>
-                    )}
-                    {task.status === TaskStatus.ERROR && (
-                      <div className='text-center text-sm text-gray-600 font-bold'>
-                        转换失败
-                      </div>
-                    )}
-                    {task.status === TaskStatus.SUCCESS && (
-                      <>
-                        <div className='text-center text-sm text-gray-600 font-bold'>
-                          转换成功
-                        </div>
-                        <a
-                          href={task.downloadUrl}
-                          className='bg-primary cursor-pointer text-white px-4 py-1 leading-6 h-8 inline-block text-sm rounded-sm transition-all hover:bg-primary-dark'
-                        >
-                          下载
-                        </a>
-                      </>
-                    )}
-                  </div>
+                  <>
+                    <TaskCard task={task} />
+                    {
+                      task.status === TaskStatus.SUCCESS && (
+                        <WebNotification title='视频转换成功通知' body={`${task.file.name}\r\n目标格式：${task.settings.format}`} icon="/favicon.ico" />
+                      )
+                    }
+                  </>
                 </motion.li>
               ))}
             </AnimatePresence>

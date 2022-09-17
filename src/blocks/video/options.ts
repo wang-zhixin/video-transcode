@@ -166,6 +166,10 @@ export const formatOptions = [
     value: 'ogv',
   },
   {
+    label:'m4a',
+    value:'m4a',
+  },
+  {
     label: 'gif',
     value: 'gif',
   },
@@ -410,6 +414,16 @@ const videoRotateOptions = [
   },
 ] as const;
 
+const transcodeTypeOptions = [
+  {
+    label: '云端转换(推荐)',
+    value: 'cloud',
+  },
+  {
+    label: '本地转换',
+    value: 'local',
+  }
+] as const;
 const options = {
   format: {
     i18nName: 'format',
