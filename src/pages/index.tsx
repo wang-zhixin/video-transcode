@@ -148,7 +148,7 @@ export default function VideoTranscode() {
                       inputRef.current.clear();
                     }}
                   >
-                    删除
+                    {t('remove')}
                   </Button>
                 </li>
               ))}
@@ -160,7 +160,7 @@ export default function VideoTranscode() {
                 variant='solid'
                 onClick={handleStartClick}
               >
-                开始转换
+                 {t('transition')}
               </Button>
             </div>
           </div>

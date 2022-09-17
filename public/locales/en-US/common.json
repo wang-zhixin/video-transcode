@@ -4,5 +4,7 @@
   "not-select-file-tips": "Please select a file first",
   "not-a-video-file": "Not a video file",
   "default": "default",
-  "format": "Target format"
+  "format": "Target format",
+  "remove": "remove",
+  "transition": "transition"
 }

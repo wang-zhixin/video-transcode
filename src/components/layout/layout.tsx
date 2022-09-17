@@ -1,11 +1,12 @@
 import Head from 'next/head';
+import Header from '../header'
 type Props = {
   children: React.ReactNode;
 };
 const Layout: React.FC<Props> = ({ children }) => {
   return (
     <div className='layout'>
-      {/* <Header /> */}
+      <Header />
       <Head>
         <title>视频格式转换助手</title>
       </Head>

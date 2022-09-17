@@ -4,5 +4,7 @@
   "not-select-file-tips": "请先选择文件!",
   "not-a-video-file": "不是视频文件",
   "default": "保持原样",
-  "format": "目标格式"
+  "format": "目标格式",
+  "remove": "删除",
+  "transition": "开始转换"
 }
