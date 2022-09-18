@@ -22,6 +22,9 @@ import { Select } from '$/components/select';
 import TaskCard from '$/blocks/video/task-card';
 import WebNotification from '$/components/web-notification';
 
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+
 const useFiles = () => {
   const [files, setFiles] = useState<File[]>([]);
   const removeFile = useCallback(
@@ -39,6 +42,8 @@ const useFiles = () => {
   return { files, addFiles, removeFile, clearFiles };
 };
 export default function VideoTranscode() {
+  const { t } = useTranslation('common')
+  const { t: optionsT } = useTranslation('video-option')
   const inputRef = useRef<InputRef>(null!);
   const { showToast } = useToast();
   const tasks = useStore((state) => state.tasks);
@@ -55,7 +60,7 @@ export default function VideoTranscode() {
             videoFiles.push(file);
           } else {
             showToast({
-              title: `${file.name} 不是视频文件`,
+              title: `${file.name} ${t('not-a-video-file')}`,
             });
           }
         });
@@ -67,7 +72,7 @@ export default function VideoTranscode() {
   const handleStartClick = () => {
     if (files.length === 0) {
       showToast({
-        title: '请先选择文件',
+        title: t('not-select-file-tips'),
       });
       return;
     }
@@ -115,9 +120,9 @@ export default function VideoTranscode() {
                       <Select<any>
                         value={settings[key as keyof typeof settings]}
                         name={key}
-                        label={`${
-                          options[key as keyof typeof settings].label
-                        }：`}
+                        label={
+                          optionsT(options[key as keyof typeof settings].label)
+                        }
                         onChange={(val) =>
                           setSetting(key as keyof typeof settings, val)
                         }
@@ -125,7 +130,7 @@ export default function VideoTranscode() {
                       >
                         {value.options.map(({ label, value }) => (
                           <Select.Option key={value} value={value}>
-                            {label}
+                            {optionsT(label)}
                           </Select.Option>
                         ))}
                       </Select>
@@ -145,7 +150,7 @@ export default function VideoTranscode() {
                       inputRef.current.clear();
                     }}
                   >
-                    删除
+                    {t('remove')}
                   </Button>
                 </li>
               ))}
@@ -157,7 +162,7 @@ export default function VideoTranscode() {
                 variant='solid'
                 onClick={handleStartClick}
               >
-                开始转换
+                 {t('transition')}
               </Button>
             </div>
           </div>
@@ -184,7 +189,7 @@ export default function VideoTranscode() {
                     <TaskCard task={task} />
                     {
                       task.status === TaskStatus.SUCCESS && (
-                        <WebNotification title='视频转换成功通知' body={`${task.file.name}\r\n目标格式：${task.settings.format}`} icon="/favicon.ico" />
+                        <WebNotification title={t('notification-succeed')} body={`${task.file.name}\r\n${t('target-format')}：${task.settings.format}`} icon="/favicon.ico" />
                       )
                     }
                   </>
@@ -200,3 +205,13 @@ export default function VideoTranscode() {
 VideoTranscode.getLayout = function getLayout(page: React.ReactElement) {
   return <Layout>{page}</Layout>;
 };
+
+
+export async function getServerSideProps({ locale }: { locale: string }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['common', 'video-option'])),
+      // Will be passed to the page component as props
+    },
+  };
+}

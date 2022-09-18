@@ -1,0 +1,23 @@
+{
+  "title": "视频格式转换助手",
+  "description": "支持各种视频格式相互转换",
+  "upload-file-tips": "拖动文件到此处或者点击添加",
+  "upload-file-active-tips": "松开鼠标放置文件",
+  "not-select-file-tips": "请先选择文件!",
+  "not-a-video-file": "不是视频文件",
+  "default": "保持原样",
+  "remove": "删除",
+  "transition": "开始转换",
+  "notification-succeed": "视频转换成功通知",
+  "target-format": "目标格式",
+  "RAW-format": "原格式",
+  "original-size": "原大小",
+  "after-the-transformation": "转换后",
+  "awaiting": "等待中",
+  "uploading": "上传中",
+  "transitioning": "转换中",
+  "success": "转换成功",
+  "fail": "转换失败",
+  "download": "下载",
+  "files-have-been-added": "{{ text }}个文件已添加"
+}
