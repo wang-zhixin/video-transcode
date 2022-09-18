@@ -6,7 +6,7 @@ module.exports = {
     locales: ['zh-CN', 'en-US'],
     // This is the default locale you want to be used when visiting
     // a non-locale prefixed path e.g. `/hello`
-    defaultLocale: 'zh-CN',
+    defaultLocale: 'en-US',
     // reloadOnPrerender: true,
   },
 }

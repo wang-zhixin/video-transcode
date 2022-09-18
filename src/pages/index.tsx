@@ -43,6 +43,7 @@ const useFiles = () => {
 };
 export default function VideoTranscode() {
   const { t } = useTranslation('common')
+  const { t: optionsT } = useTranslation('video-option')
   const inputRef = useRef<InputRef>(null!);
   const { showToast } = useToast();
   const tasks = useStore((state) => state.tasks);
@@ -119,18 +120,17 @@ export default function VideoTranscode() {
                       <Select<any>
                         value={settings[key as keyof typeof settings]}
                         name={key}
-                        label={`${
-                          options[key as keyof typeof settings].label(t(options[key as keyof typeof settings].i18nName))
-                        }：`}
+                        label={
+                          optionsT(options[key as keyof typeof settings].label)
+                        }
                         onChange={(val) =>
                           setSetting(key as keyof typeof settings, val)
                         }
                         className='w-full'
                       >
-                        {/* 渲染选择器配置时，如果是第一个，则使用i18n的方式渲染label */}
-                        {value.options.map((item, index) => (index === 0 ? {...item, label: t('default')}: item)).map(({ label, value }) => (
+                        {value.options.map(({ label, value }) => (
                           <Select.Option key={value} value={value}>
-                            {label}
+                            {optionsT(label)}
                           </Select.Option>
                         ))}
                       </Select>
@@ -189,7 +189,7 @@ export default function VideoTranscode() {
                     <TaskCard task={task} />
                     {
                       task.status === TaskStatus.SUCCESS && (
-                        <WebNotification title='视频转换成功通知' body={`${task.file.name}\r\n目标格式：${task.settings.format}`} icon="/favicon.ico" />
+                        <WebNotification title={t('notification-succeed')} body={`${task.file.name}\r\n${t('target-format')}：${task.settings.format}`} icon="/favicon.ico" />
                       )
                     }
                   </>
@@ -210,7 +210,7 @@ VideoTranscode.getLayout = function getLayout(page: React.ReactElement) {
 export async function getServerSideProps({ locale }: { locale: string }) {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ['common'])),
+      ...(await serverSideTranslations(locale, ['common', 'video-option'])),
       // Will be passed to the page component as props
     },
   };

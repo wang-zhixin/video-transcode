@@ -1,10 +1,23 @@
 {
+  "title": "Video format converting",
+  "description": "Supports various video formats to convert to each other",
   "upload-file-tips": "Click or drag file to this area to upload",
   "upload-file-active-tips": "Click or drag file to this area to upload",
   "not-select-file-tips": "Please select a file first",
   "not-a-video-file": "Not a video file",
-  "default": "default",
-  "format": "Target format",
-  "remove": "remove",
-  "transition": "transition"
+  "default": "Default",
+  "remove": "Remove",
+  "transition": "Transition",
+  "notification-succeed": "Notification of video conversion success",
+  "target-format": "Target format",
+  "RAW-format": "RAW-format",
+  "original-size": "Original size",
+  "after-the-transformation": "After the transformation",
+  "awaiting": "Awaiting",
+  "uploading": "Uploading",
+  "transitioning": "Transitioning",
+  "success": "Success",
+  "fail": "Fail",
+  "download": "Download",
+  "files-have-been-added": "{{ text }} have been added"
 }

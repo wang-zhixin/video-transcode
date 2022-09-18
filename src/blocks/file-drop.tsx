@@ -1,5 +1,6 @@
 import { useRef, useImperativeHandle, forwardRef, Ref } from 'react';
 import type { DropTargetMonitor } from 'react-dnd';
+import { useRouter } from 'next/router'
 import { useDrop } from 'react-dnd';
 import { NativeTypes } from 'react-dnd-html5-backend';
 import FilePlus from '@geist-ui/icons/filePlus';
@@ -31,6 +32,8 @@ const Text: React.FC<TextProps> = (props) => {
 };
 const FileDrop = (props: FileDropType, ref: Ref<InputRef>) => {
   const { t } = useTranslation('common')
+  const { locale } = useRouter()
+  
   const [{ canDrop, isOver }, drop] = useDrop(
     () => ({
       accept: [NativeTypes.FILE],
@@ -91,7 +94,7 @@ const FileDrop = (props: FileDropType, ref: Ref<InputRef>) => {
         <div>
           {isActive ? t('upload-file-active-tips'): t('upload-file-tips')}
         </div>
-        {props.filesCount > 0 && <div>{props.filesCount}个文件已添加</div>}
+        {props.filesCount > 0 && <div>{props.filesCount}  {t('files-have-been-added', { text: locale == 'en-US' ? props.filesCount > 1 ? 'Files':'File' : "" })}</div>}
       </div>
 
       <input

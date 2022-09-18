@@ -7,20 +7,23 @@ import Progress from '$/components/progress';
 import type { Task } from '$/types/task';
 import { TaskStatus } from '$/types/task';
 import options from '$/blocks/video/options';
+import { useTranslation } from 'next-i18next';
 import clsx from 'clsx';
 
 type Props = {
   task: Task;
 };
 const TaskCard = ({ task }: Props) => {
+  const { t } = useTranslation('common')
+  const { t: optionsT } = useTranslation('video-option')
   const downloadOutput = useStore((state) => state.downloadOutput);
   return (
     <div className={clsx('relative p-2 border-2  border-solid  shadow-card hover:shadow-hover transition-all duration-300 rounded', CardStyle[task.status])}>
       <div className='absolute top-0 right-0 bg-primary-light rounded-bl-md text-primary-dark text-xs px-2 py-1'>
         {
-          options.transcodeType.options.find(
+          optionsT(options.transcodeType.options.find(
             (option) => option.value === task.settings.transcodeType
-          )?.label
+          )?.label!)
         }
       </div>
       <div className='truncate'>
@@ -32,19 +35,19 @@ const TaskCard = ({ task }: Props) => {
         </span>
       </div>
       <div className='text-sm text-gray-600 mt-2'>
-        <span className='mr-1'>原格式: {task.file.type.split('/')[1]}</span>
+        <span className='mr-1'>{t('RAW-format')}: {task.file.type.split('/')[1]}</span>
         {/* 遍历settings对象 */}
         {Object.entries(task.settings).map(
           ([key, value]) =>
             value && key !== 'transcodeType' && (
               <span key={key} className='mr-1'>
-                {options[key as keyof typeof options].label}: {value}
+                {optionsT(options[key as keyof typeof options].label)}: {value}
               </span>
             )
         )}
-        <span>原大小：{prettyBytes(task.file.size)}</span>
+        <span>{t('original-size')}：{prettyBytes(task.file.size)}</span>
         {task.outputs && (
-          <span>转换后：{prettyBytes(task.outputs[0].size)}</span>
+          <span>{t('after-the-transformation')}：{prettyBytes(task.outputs[0].size)}</span>
         )}
       </div>
       {task.status === TaskStatus.UPLOADING && (
@@ -53,35 +56,35 @@ const TaskCard = ({ task }: Props) => {
       <div className='flex justify-between items-center h-10 border-t border-solid border-gray-100 mt-2 pt-3'>
         {task.status === TaskStatus.PENDIND && (
           <div className='text-center text-sm text-gray-600 font-bold'>
-            等待中...
+            {t('awaiting')}...
           </div>
         )}
         {task.status === TaskStatus.UPLOADING && (
           <div className='text-center text-sm text-gray-600 font-bold'>
-            上传中...
+            {t('uploading')}...
           </div>
         )}
         {task.status === TaskStatus.CONVERTING && (
           <div className='text-center text-sm text-gray-600 font-bold'>
-            转换中...
+            {t('transitioning')}...
           </div>
         )}
         {task.status === TaskStatus.ERROR && (
           <div className='text-center text-sm text-gray-600 font-bold'>
-            转换失败
+            {t('fail')}
           </div>
         )}
         {task.status === TaskStatus.SUCCESS && (
           <>
             <div className='text-center text-sm text-gray-600 font-bold'>
-              转换成功
+              {t('succeed')}
             </div>
             {task.settings.transcodeType === 'cloud' && (
               <a
                 href={task.downloadUrl}
                 className='bg-primary cursor-pointer text-white px-4 py-1 leading-6 h-8 inline-block text-sm rounded-sm transition-all hover:bg-primary-dark'
               >
-                下载
+                {t('download')}
               </a>
             )}
 
@@ -92,7 +95,7 @@ const TaskCard = ({ task }: Props) => {
                 variant='solid'
                 onClick={() => downloadOutput(task)}
               >
-                下载
+                {t('download')}
               </Button>
             )}
           </>
