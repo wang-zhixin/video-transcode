@@ -1,14 +1,15 @@
+import type { GetStaticProps } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
-import Header from '../header'
+// import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
 
 type Props = {
   children: React.ReactNode;
 };
 const Layout: React.FC<Props> = ({ children }) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('common');
   return (
     <div className='layout'>
       {/* <Header /> */}
@@ -19,9 +20,15 @@ const Layout: React.FC<Props> = ({ children }) => {
         <meta name='description' content={t('description')} />
       </Head>
       <header className='bg-white shadow-sm'>
-        <Link href="/" >
+        <Link href='/'>
           <a className='px-4 md:px-8 container mx-auto flex items-center py-2'>
-            <Image className='rounded' src="/logo.png" width={42} height={42} alt="logo" />
+            <Image
+              className='rounded'
+              src='/logo.png'
+              width={42}
+              height={42}
+              alt='logo'
+            />
             <h1 className='ml-4'>{t('title')}</h1>
           </a>
         </Link>
@@ -33,3 +40,11 @@ const Layout: React.FC<Props> = ({ children }) => {
 };
 
 export default Layout;
+
+// export const getStaticProps: GetStaticProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       ...(await serverSideTranslations(locale!, ['common', 'video-option'])),
+//     },
+//   };
+// };
