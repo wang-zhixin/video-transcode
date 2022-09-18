@@ -16,7 +16,7 @@
   "awaiting": "等待中",
   "uploading": "上传中",
   "transitioning": "转换中",
-  "success": "转换成功",
+  "succeed": "转换成功",
   "fail": "转换失败",
   "download": "下载",
   "files-have-been-added": "{{ text }}个文件已添加"

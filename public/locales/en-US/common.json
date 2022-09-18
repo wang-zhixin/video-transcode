@@ -16,7 +16,7 @@
   "awaiting": "Awaiting",
   "uploading": "Uploading",
   "transitioning": "Transitioning",
-  "success": "Success",
+  "succeed": "Success",
   "fail": "Fail",
   "download": "Download",
   "files-have-been-added": "{{ text }} have been added"

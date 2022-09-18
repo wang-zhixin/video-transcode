@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useRef } from 'react';
-import { useState } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+import type { GetStaticProps } from 'next';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 
@@ -42,15 +42,15 @@ const useFiles = () => {
   return { files, addFiles, removeFile, clearFiles };
 };
 export default function VideoTranscode() {
-  const { t } = useTranslation('common')
-  const { t: optionsT } = useTranslation('video-option')
+  const { t } = useTranslation('common');
+  const { t: optionsT } = useTranslation('video-option');
   const inputRef = useRef<InputRef>(null!);
   const { showToast } = useToast();
   const tasks = useStore((state) => state.tasks);
   const addTasks = useStore((state) => state.addTasks);
   const { files, addFiles, removeFile, clearFiles } = useFiles();
 
-  const {show, requestPermission} = useNotification();
+  const { show, requestPermission } = useNotification();
   const onFileChange: FileDropType['onChange'] = useCallback(
     (files) => {
       if (files) {
@@ -67,7 +67,7 @@ export default function VideoTranscode() {
         addFiles(videoFiles);
       }
     },
-    [addFiles, showToast]
+    [addFiles, showToast, t]
   );
   const handleStartClick = () => {
     if (files.length === 0) {
@@ -76,7 +76,7 @@ export default function VideoTranscode() {
       });
       return;
     }
-    requestPermission()
+    requestPermission();
     addTasks(files, settings);
     clearFiles();
     inputRef.current.clear();
@@ -120,9 +120,9 @@ export default function VideoTranscode() {
                       <Select<any>
                         value={settings[key as keyof typeof settings]}
                         name={key}
-                        label={
-                          optionsT(options[key as keyof typeof settings].label)
-                        }
+                        label={optionsT(
+                          options[key as keyof typeof settings].label
+                        )}
                         onChange={(val) =>
                           setSetting(key as keyof typeof settings, val)
                         }
@@ -162,7 +162,7 @@ export default function VideoTranscode() {
                 variant='solid'
                 onClick={handleStartClick}
               >
-                 {t('transition')}
+                {t('transition')}
               </Button>
             </div>
           </div>
@@ -183,15 +183,18 @@ export default function VideoTranscode() {
                     scale: 0.5,
                     transition: { duration: 0.2 },
                   }}
-                  
                 >
                   <>
                     <TaskCard task={task} />
-                    {
-                      task.status === TaskStatus.SUCCESS && (
-                        <WebNotification title={t('notification-succeed')} body={`${task.file.name}\r\n${t('target-format')}：${task.settings.format}`} icon="/favicon.ico" />
-                      )
-                    }
+                    {task.status === TaskStatus.SUCCESS && (
+                      <WebNotification
+                        title={t('notification-succeed')}
+                        body={`${task.file.name}\r\n${t('target-format')}：${
+                          task.settings.format
+                        }`}
+                        icon='/favicon.ico'
+                      />
+                    )}
                   </>
                 </motion.li>
               ))}
@@ -206,12 +209,10 @@ VideoTranscode.getLayout = function getLayout(page: React.ReactElement) {
   return <Layout>{page}</Layout>;
 };
 
-
-export async function getServerSideProps({ locale }: { locale: string }) {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ['common', 'video-option'])),
-      // Will be passed to the page component as props
+      ...(await serverSideTranslations(locale!, ['common', 'video-option'])),
     },
   };
-}
+};
