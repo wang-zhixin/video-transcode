@@ -1,0 +1,52 @@
+edition: 1.0.0
+name: web-framework-app
+
+access: default
+
+vars: # 全局变量
+  region: cn-beijing
+  service:
+    name: web-app
+    description: web app
+services:
+  transcode-web:
+    component: fc
+    props: # 组件的属性值
+      region: ${vars.region}
+      service: ${vars.service}
+      function:
+        name: transcode-web
+        description: 'Serverless Devs Web Framework Function'
+        codeUri: '.next/standalone/'
+        runtime: custom
+        instanceConcurrency: 5
+        customRuntimeConfig:
+          command:
+            - /code/node-v16.17.1-linux-x64/bin/node 
+          args:
+            - server.js
+            - --keepAliveTimeout 0
+        timeout: 60
+        environmentVariables:
+          ALI_BUCKET_NAME: ${env.ALI_BUCKET_NAME}
+          ALI_REGION: ${env.ALI_REGION}
+          ALI_ACCOUNT_ID: ${env.ALI_ACCOUNT_ID}
+          ALI_ACCESSKEY_ID: ${env.ALI_ACCESSKEY_ID}
+          ALI_ACCESSKEY_SECRET: ${env.ALI_ACCESSKEY_SECRET}
+        caPort: 3000
+      triggers:
+        - name: httpTrigger
+          type: http
+          config:
+            authType: anonymous
+            methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - HEAD
+      customDomains:
+        - domainName: auto
+          protocol: HTTP
+          routeConfigs:
+            - path: '/*'

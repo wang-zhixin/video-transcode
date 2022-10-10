@@ -2,6 +2,7 @@
 const withPWA = require('next-pwa')
 const { i18n } = require("./next-i18next.config")
 const nextConfig = withPWA({
+  output: 'standalone',
   i18n,
   reactStrictMode: true,
   async headers() {
