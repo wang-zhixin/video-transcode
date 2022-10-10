@@ -1,6 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
 import FnFClient, { StartExecutionResponse } from '@alicloud/fnf-2019-03-15';
+import Cors from 'cors'
 import buildDescribeExecutionUrl from '$/utils/flow';
 type FlowInput = {
   bucketName: string;
@@ -15,6 +16,25 @@ type OutputItem = {
   key: string;
   size: string | number;
 };
+const cors = Cors({
+  methods: ['POST', 'GET', 'HEAD'],
+})
+
+function runMiddleware(
+  req: NextApiRequest,
+  res: NextApiResponse,
+  fn: Function
+) {
+  return new Promise((resolve, reject) => {
+    fn(req, res, (result: any) => {
+      if (result instanceof Error) {
+        return reject(result)
+      }
+
+      return resolve(result)
+    })
+  })
+}
 
 export default async function handler(
   req: NextApiRequest,
@@ -24,6 +44,7 @@ export default async function handler(
     }
   >
 ) {
+  await runMiddleware(req, res, cors)
   if (req.method === 'GET') {
     const { name, flowName } = req.query;
     if (!name || !flowName) {
