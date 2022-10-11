@@ -33,7 +33,7 @@ export default async function handler(
   const STSpolicy = {
     Statement: [
       {
-        Action: ['oss:*'],
+        Action: ['oss:PutObject', 'oss:GetObject', 'oss:InitiateMultipartUpload', 'oss:UploadPart', 'oss:CompleteMultipartUpload', 'oss:AbortMultipartUpload', 'oss:UploadPartCopy'],
         Effect: 'Allow',
         Resource: ['acs:oss:cn-beijing:*:my-pc-test/*']
       }
