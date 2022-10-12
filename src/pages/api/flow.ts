@@ -92,9 +92,14 @@ export default async function handler(
       FlowName: 'video-transcode-common-flow',
       Input: JSON.stringify(Input),
     });
+    const DescribeExecutionUrl = buildDescribeExecutionUrl(
+      startExecutionRes.Name,
+      startExecutionRes.FlowName
+    );
     res.status(200).json({
       Name: startExecutionRes.Name,
       FlowName: startExecutionRes.FlowName,
+      DescribeExecutionUrl
     });
   }
 }
