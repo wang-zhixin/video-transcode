@@ -25,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     const json = await response.json();
     if(json.err_no === 0) {
       const token = jwt.sign({
-        dyOpenid: json.openid,
+        dyOpenid: json.data.openid,
         createAt: Date.now()
       }, process.env.JWT_KEY, {
         expiresIn: '30 days',

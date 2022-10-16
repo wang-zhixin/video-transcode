@@ -35,7 +35,7 @@ export default async function handler(
       {
         Action: ['oss:PutObject', 'oss:PostObject', 'oss:GetObject', 'oss:InitiateMultipartUpload', 'oss:UploadPart', 'oss:CompleteMultipartUpload', 'oss:AbortMultipartUpload', 'oss:UploadPartCopy'],
         Effect: 'Allow',
-        Resource: ['acs:oss:cn-beijing:*:my-pc-test/*']
+        Resource: ['acs:oss:oss-' + process.env.ALI_REGION+ ':' + process.env.ALI_ACCOUNT_ID + ':' + process.env.ALI_BUCKET_NAME + '/*']
       }
     ],
     Version: '1'
