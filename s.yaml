@@ -33,6 +33,9 @@ services:
           ALI_ACCOUNT_ID: ${env.ALI_ACCOUNT_ID}
           ALI_ACCESSKEY_ID: ${env.ALI_ACCESSKEY_ID}
           ALI_ACCESSKEY_SECRET: ${env.ALI_ACCESSKEY_SECRET}
+          DOUYIN_APPID: ${env.DOUYIN_APPID}
+          DOUYIN_APPSECRET: ${env.DOUYIN_APPSECRET}
+          JWT_KEY: ${env.JWT_KEY}
         caPort: 3000
       triggers:
         - name: httpTrigger

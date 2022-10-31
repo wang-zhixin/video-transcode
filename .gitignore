@@ -47,3 +47,4 @@ yarn-error.log*
 
 .s
 node-v16.17.1-linux-x64
+alioss.config.json

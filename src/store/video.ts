@@ -60,7 +60,7 @@ const useStore = create<State>()(
           if (task.settings.transcodeType === 'local') {
             transcode(task);
           } else {
-            await uploadFile(task);
+            uploadFile(task);
             const startFlowResponse = await startFlow(task);
             checkTaskStatus(task, startFlowResponse);
           }
@@ -99,7 +99,7 @@ const useStore = create<State>()(
               });
             }
           })
-          .catch((err) => {
+          .catch(() => {
             set((state) => {
               state.tasks.forEach((t) => {
                 if (t.id === task.id) {
@@ -113,6 +113,9 @@ const useStore = create<State>()(
       async startFlow(task: Task) {
         const response = await fetch('/api/flow', {
           method: 'POST',
+          headers: {
+            'x-platform': 'web'
+          },
           body: JSON.stringify({
             bucketName: process.env.ALI_BUCKET_NAME,
             videoKey: task.videoKey,

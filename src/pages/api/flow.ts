@@ -2,7 +2,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import FnFClient, { StartExecutionResponse } from '@alicloud/fnf-2019-03-15';
 import Cors from 'cors'
+import jwt  from 'jsonwebtoken'
+
 import buildDescribeExecutionUrl from '$/utils/flow';
+
 type FlowInput = {
   bucketName: string;
   videoKey: string;
@@ -76,7 +79,28 @@ export default async function handler(
       accessKeySecret: process.env.ALI_ACCESSKEY_SECRET,
     });
     const body = JSON.parse(req.body);
+    const headers = req.headers
     const options = body.options || {};
+
+    
+
+    // 取消
+    if(body.Name || body.FlowName) {
+      return await client.stopExecution({
+        FlowName: body.FlowName,
+        ExecutionName: body.Name,
+        Cause: 'user abort',
+      })
+    }
+    const token = headers.authorization
+    let dyOpenid = ''
+    if(token) {
+      const decoded = jwt.verify(token.split('Bearea ')[1], process.env.JWT_KEY) as jwt.JwtPayload
+      if(decoded.dyOpenid) {
+        dyOpenid = decoded.dyOpenid
+      }
+    }
+
     const Input: FlowInput = {
       bucketName: process.env.ALI_BUCKET_NAME,
       videoKey: body.videoKey,
@@ -85,6 +109,8 @@ export default async function handler(
       segmentTimeSeconds: 30,
       dst_formats: body.targetType,
       fileName: body.fileName,
+      platform: headers['x-platform'] || '',
+      dyOpenid,
       ...options,
       // muted: options.muted,
     };
