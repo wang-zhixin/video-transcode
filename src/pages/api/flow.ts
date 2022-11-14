@@ -114,8 +114,25 @@ export default async function handler(
       ...options,
       // muted: options.muted,
     };
+    let FlowName = 'video-transcode-flow'
+
+    // if(body.size && body.size > 1024 * 1024 * 80) {
+    //   FlowName = 'video-transcode-flow-plus'
+    // }
+    if(body.targetType && body.targetType[0] === 'rm') {
+      FlowName = 'video-transcode-common-flow'
+    }
+    if(body.targetType && body.targetType[0] === 'amv') {
+      FlowName = 'video-transcode-common-flow'
+    }
+    if(body.targetType && body.targetType[0] === 'mp3') {
+      FlowName = 'video-transcode-common-flow'
+    }
+    if(body.targetType && body.targetType[0] === 'flv') {
+      FlowName = 'video-transcode-common-flow'
+    }
     const startExecutionRes = await client.startExecution({
-      FlowName: 'video-transcode-common-flow',
+      FlowName: FlowName,
       Input: JSON.stringify(Input),
     });
     const DescribeExecutionUrl = buildDescribeExecutionUrl(

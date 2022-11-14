@@ -36,6 +36,8 @@ services:
           DOUYIN_APPID: ${env.DOUYIN_APPID}
           DOUYIN_APPSECRET: ${env.DOUYIN_APPSECRET}
           JWT_KEY: ${env.JWT_KEY}
+          TENCENT_SECRET_ID: ${env.TENCENT_SECRET_ID}
+          TENCENT_SECRET_KEY: ${env.TENCENT_SECRET_KEY}
         caPort: 3000
       triggers:
         - name: httpTrigger
