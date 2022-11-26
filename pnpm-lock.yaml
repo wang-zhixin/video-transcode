@@ -2,6 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@alicloud/fnf-2019-03-15': ^1.2.0
+  '@alicloud/pop-core': ^1.7.12
   '@babel/core': ^7.18.6
   '@cloudbase/node-sdk': ^2.9.1
   '@ffmpeg/core': ^0.10.0
@@ -58,6 +59,7 @@ specifiers:
 
 dependencies:
   '@alicloud/fnf-2019-03-15': 1.2.0
+  '@alicloud/pop-core': 1.7.12
   '@cloudbase/node-sdk': 2.9.1_typescript@4.6.4
   '@ffmpeg/core': 0.10.0
   '@ffmpeg/ffmpeg': 0.10.1
