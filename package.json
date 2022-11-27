@@ -3,15 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "PORT=4000 next dev",
     "build": "next build",
     "start": "next start",
+    "deploy:oss": "npx aliyunoss-cli",
     "lint": "next lint",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
   "dependencies": {
     "@alicloud/fnf-2019-03-15": "^1.2.0",
+    "@alicloud/pop-core": "^1.7.12",
+    "@cloudbase/node-sdk": "^2.9.1",
     "@ffmpeg/core": "^0.10.0",
     "@ffmpeg/ffmpeg": "^0.10.1",
     "@geist-ui/icons": "^1.0.2",

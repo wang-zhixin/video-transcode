@@ -14,6 +14,11 @@ declare module '@alicloud/fnf-2019-03-15' {
     StartedTime: string;
     Output: string;
   };
+  type StopExecutionParams = {
+    FlowName: string
+    ExecutionName: string
+    Cause?: string
+  }
 
   export default class FnFClient {
     constructor(options: {
@@ -32,5 +37,6 @@ declare module '@alicloud/fnf-2019-03-15' {
       params: StartExecutionRequestParams,
       options?: any
     ): Promise<StartExecutionResponse>;
+    stopExecution(params:StopExecutionParams): Promise<any>
   }
 }
