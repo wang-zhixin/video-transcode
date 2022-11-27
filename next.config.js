@@ -5,7 +5,7 @@ const isProd = process.env.NODE_ENV === 'production'
 
 const nextConfig = withPWA({
   output: 'standalone',
-  assetPrefix: isProd ? 'https://static.ahelpers.com' : undefined,
+  assetPrefix: (isProd && !process.env.VERCEL) ? 'https://static.ahelpers.com' : undefined,
   i18n,
   reactStrictMode: true,
   async headers() {
