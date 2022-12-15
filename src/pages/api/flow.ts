@@ -81,9 +81,6 @@ export default async function handler(
     const body = JSON.parse(req.body);
     const headers = req.headers
     const options = body.options || {};
-
-    
-
     // 取消
     if(body.Name || body.FlowName) {
       return await client.stopExecution({
@@ -95,12 +92,17 @@ export default async function handler(
     const token = headers.authorization
     let dyOpenid = ''
     if(token) {
-      const decoded = jwt.verify(token.split('Bearea ')[1], process.env.JWT_KEY) as jwt.JwtPayload
-      if(decoded.dyOpenid) {
-        dyOpenid = decoded.dyOpenid
+      try {
+        const decoded = jwt.verify(token.split('Bearea ')[1], process.env.JWT_KEY) as jwt.JwtPayload
+        if(decoded.dyOpenid) {
+          dyOpenid = decoded.dyOpenid
+        }
+      } catch (error) {
+        console.log(error)
+        res.status(401).end()
+        return
       }
     }
-
     const Input: FlowInput = {
       bucketName: process.env.ALI_BUCKET_NAME,
       videoKey: body.videoKey,
@@ -114,23 +116,23 @@ export default async function handler(
       ...options,
       // muted: options.muted,
     };
-    let FlowName = 'video-transcode-flow'
+    let FlowName = 'video-transcode-common2-flow'
 
     // if(body.size && body.size > 1024 * 1024 * 80) {
     //   FlowName = 'video-transcode-flow-plus'
     // }
-    if(body.targetType && body.targetType[0] === 'rm') {
-      FlowName = 'video-transcode-common-flow'
-    }
-    if(body.targetType && body.targetType[0] === 'amv') {
-      FlowName = 'video-transcode-common-flow'
-    }
-    if(body.targetType && body.targetType[0] === 'mp3') {
-      FlowName = 'video-transcode-common-flow'
-    }
-    if(body.targetType && body.targetType[0] === 'flv') {
-      FlowName = 'video-transcode-common-flow'
-    }
+    // if(body.targetType && body.targetType[0] === 'rm') {
+    //   FlowName = 'video-transcode-common-flow'
+    // }
+    // if(body.targetType && body.targetType[0] === 'amv') {
+    //   FlowName = 'video-transcode-common-flow'
+    // }
+    // if(body.targetType && body.targetType[0] === 'mp3') {
+    //   FlowName = 'video-transcode-common-flow'
+    // }
+    // if(body.targetType && body.targetType[0] === 'flv') {
+    //   FlowName = 'video-transcode-common-flow'
+    // }
     const startExecutionRes = await client.startExecution({
       FlowName: FlowName,
       Input: JSON.stringify(Input),
