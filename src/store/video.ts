@@ -20,7 +20,7 @@ type StartFlowResponse = {
 type State = {
   tasks: Task[];
   addTasks: (files: File[], settings: Settings) => void;
-  uploadFile: (task: Task) => void;
+  uploadFile: (task: Task) => Promise<any>;
   startTasks: (tasks: Task[]) => void;
   startFlow: (task: Task) => Promise<StartFlowResponse>;
   transcode: (task: Task) => void;
@@ -60,7 +60,7 @@ const useStore = create<State>()(
           if (task.settings.transcodeType === 'local') {
             transcode(task);
           } else {
-            uploadFile(task);
+            await uploadFile(task);
             const startFlowResponse = await startFlow(task);
             checkTaskStatus(task, startFlowResponse);
           }
@@ -205,7 +205,7 @@ const useStore = create<State>()(
         }
       },
       uploadFile: async (task) => {
-        await uploadFile(task.videoKey, task.file, {
+        return uploadFile(task.videoKey, task.file, {
           progress: (percent) => {
             set((state) => {
               state.tasks.forEach((t) => {
@@ -215,13 +215,6 @@ const useStore = create<State>()(
               });
             });
           },
-        });
-        set((state) => {
-          const index = state.tasks.findIndex((t) => t.id === task.id);
-          if (index > -1) {
-            state.tasks[index].status = TaskStatus.CONVERTING;
-            state.tasks[index].progress = 100;
-          }
         });
       },
       downloadOutput: async (task) => {
