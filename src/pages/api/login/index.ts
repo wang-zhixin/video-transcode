@@ -1,6 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
 import jwt  from 'jsonwebtoken'
+import { checkDouYinApp, getAppInfo } from '$/server/common/douyin'
 type Data = {
   success: boolean;
   data: {
@@ -9,15 +10,15 @@ type Data = {
   }
 };
 export default async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
-  if (req.query.platform === 'douyin' && req.query.code) {
-    console.log('process.env.DOUYIN_APPID', process.env.DOUYIN_APPID)
+  if (req.query.code && checkDouYinApp(req)) {
+    const tenantToken = req.headers['x-tenant-token'] as string
+    const appInfo = getAppInfo(tenantToken)
     const response = await fetch(
       `https://developer.toutiao.com/api/apps/v2/jscode2session`,
       {
         method: 'POST',
         body: JSON.stringify({
-          appid: process.env.DOUYIN_APPID,
-          secret: process.env.DOUYIN_APPSECRET,
+          ...appInfo,
           code: req.query.code
         })
       }

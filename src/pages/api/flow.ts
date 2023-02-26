@@ -3,7 +3,6 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import FnFClient, { StartExecutionResponse } from '@alicloud/fnf-2019-03-15';
 import Cors from 'cors'
 import jwt  from 'jsonwebtoken'
-
 import buildDescribeExecutionUrl from '$/utils/flow';
 
 type FlowInput = {
@@ -113,26 +112,14 @@ export default async function handler(
       fileName: body.fileName,
       platform: headers['x-platform'] || '',
       dyOpenid,
+      tenant: headers['x-tenant-token'] || '',
       ...options,
       // muted: options.muted,
     };
     let FlowName = 'video-transcode-common2-flow'
-
-    // if(body.size && body.size > 1024 * 1024 * 80) {
-    //   FlowName = 'video-transcode-flow-plus'
-    // }
-    // if(body.targetType && body.targetType[0] === 'rm') {
-    //   FlowName = 'video-transcode-common-flow'
-    // }
-    // if(body.targetType && body.targetType[0] === 'amv') {
-    //   FlowName = 'video-transcode-common-flow'
-    // }
-    // if(body.targetType && body.targetType[0] === 'mp3') {
-    //   FlowName = 'video-transcode-common-flow'
-    // }
-    // if(body.targetType && body.targetType[0] === 'flv') {
-    //   FlowName = 'video-transcode-common-flow'
-    // }
+    if(body.targetType.indexOf('mp3') > -1) {
+      FlowName = 'video-processing-mp3-fc-flow'
+    }
     const startExecutionRes = await client.startExecution({
       FlowName: FlowName,
       Input: JSON.stringify(Input),
